@@ -35,7 +35,7 @@ flowchart LR
 
 | Module | Responsibility |
 |---|---|
-| `qrshield/qr_decode.py` | Multi-variant OpenCV decoding, rotations, tiling, multi-code masking, optional WeChat models |
+| `qrshield/qr_decode.py` | Multi-variant OpenCV + ZXing decoding, rotations, tiling, multi-code masking, optional WeChat models |
 | `qrshield/features.py` | URL parsing, 78 numeric features, brand/lookalike detection, text normalisation |
 | `qrshield/brands.py` | Official brand domains, risky TLDs, shorteners, keyword lists |
 | `qrshield/model.py` | Artifact loading, ensemble inference, calibration, token/numeric explanations |
@@ -56,7 +56,9 @@ tries a sequence of pre-processing variants:
 2. 90°/180°/270° rotations if the first pass finds nothing.
 3. Mask each decoded code and rescan the frame to find additional codes.
 4. Overlapping tiles for busy images with several codes.
-5. Optional WeChat detector for curved or low-contrast photos.
+5. ZXing-C++ across the same variants, for glossy screenshots and overexposed
+   photos that defeat OpenCV's decoder.
+6. Optional WeChat detector for curved or low-contrast photos.
 
 Each attempt is timed and recorded, so the UI can show which strategy succeeded.
 Decoding failures return `ok: false` with an actionable error instead of a
@@ -221,7 +223,7 @@ Measured on Windows 10, Python 3.9, 8 logical cores
 | Single URL inference | 3.96 ms mean, 5.67 ms p95 |
 | Batch inference | ~5,350 URLs/s |
 | Full `scan_url` (model + rules) | 5.73 ms mean, 6.91 ms p95 |
-| QR decode (11 distortions) | 11/11, 0.65 s mean |
+| QR decode (11 distortions) | 11/11, 0.26 s mean |
 
 QR decoding dominates end-to-end latency. The model itself is negligible.
 

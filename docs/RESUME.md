@@ -76,10 +76,11 @@ and low-contrast images.
 
 **Action:** Built a multi-variant decoder: upscaling, CLAHE, adaptive/Otsu
 thresholding, sharpening, inversion, rotations, multi-code masking, and
-overlapping tiles. Added an optional WeChat detector hook. Wrote a benchmark
-that applies 11 distortions and measures per-method timing.
+overlapping tiles. Added ZXing-C++ as a second engine and an optional WeChat
+detector hook. Wrote a benchmark that applies 11 distortions and measures
+per-method timing.
 
-**Result:** 11/11 distortions decoded, 0.65 s mean, and two codes found in a
+**Result:** 11/11 distortions decoded, 0.26 s mean, and two codes found in a
 single frame.
 
 ### 3. Explaining model decisions
@@ -104,7 +105,7 @@ workflow.
 **Task:** Make it installable, testable, and deployable.
 
 **Action:** Added `pyproject.toml` with a console entry point, pinned
-requirements, 56 tests (features, scanner, decoder, model, API, CLI, history,
+requirements, 58 tests (features, scanner, decoder, model, API, CLI, history,
 split integrity), ruff linting, coverage, GitHub Actions across four Python
 versions, a non-root Dockerfile with healthcheck, docker-compose, Makefile, and
 full documentation (README, model card, architecture, evaluation, security).
@@ -125,8 +126,8 @@ app; CI catches lint, test, and packaging regressions.
 | Model size / load | 4.54 MB / 1.82 s |
 | Inference latency | 3.96 ms mean, 5.67 ms p95 |
 | Batch throughput | ~5,350 URLs/s |
-| QR decode benchmark | 11/11, 0.65 s mean |
-| Tests | 56 passing |
+| QR decode benchmark | 11/11, 0.26 s mean |
+| Tests | 58 passing |
 
 ## Likely interview questions
 

@@ -5,7 +5,7 @@ explainable rules.**
 
 [![CI](https://github.com/Santhosh20collab/Qr-Shield-/actions/workflows/ci.yml/badge.svg)](https://github.com/Santhosh20collab/Qr-Shield-/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](pyproject.toml)
-[![Tests](https://img.shields.io/badge/tests-56%20passing-2ea44f)](tests)
+[![Tests](https://img.shields.io/badge/tests-58%20passing-2ea44f)](tests)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Model F1](https://img.shields.io/badge/test%20F1-0.984-6f42c1)](docs/EVALUATION.md)
 [![Model FPR](https://img.shields.io/badge/false%20positive%20rate-0.36%25-e05d44)](docs/EVALUATION.md)
@@ -34,7 +34,7 @@ machine.
 - **CLI + API + dashboard** — single and batch scanning, JSON/CSV reports,
   meaningful exit codes, searchable SQLite history, live statistics, and a
   7-day trend chart.
-- **Production-shaped** — 56 tests, ruff, coverage, CI across four Python
+- **Production-shaped** — 58 tests, ruff, coverage, CI across four Python
   versions, non-root Docker image with healthcheck, model card, architecture
   and evaluation docs.
 
@@ -73,6 +73,11 @@ qrshield url "http://paypal.com.secure-login.xyz/verify"
 | Malicious result | Batch QR scan |
 |---|---|
 | ![Scan result](docs/screenshots/scan-result.jpg) | ![Batch scan](docs/screenshots/batch.jpg) |
+
+Non-URL payloads are handled too — here a Wi-Fi join code from a phone photo
+that OpenCV could not decode:
+
+![Wi-Fi QR decoded and explained](docs/screenshots/wifi-result.jpg)
 
 ![Local dashboard with statistics and history](docs/screenshots/dashboard.jpg)
 
@@ -134,7 +139,7 @@ metrics, confusion matrices, calibration, and error analysis are in
 | Model size / load | 4.54 MB / 1.82 s |
 | Single URL inference | 3.96 ms mean, 5.67 ms p95 |
 | Batch inference | ~5,350 URLs/s |
-| QR decode benchmark | 11/11 distortions, 0.65 s mean |
+| QR decode benchmark | 11/11 distortions, 0.26 s mean |
 
 ## CLI
 
@@ -234,7 +239,9 @@ Decoding is deliberately aggressive because phone photos are noisy:
 2. 90°/180°/270° rotations when the first pass finds nothing.
 3. Mask each decoded code and rescan for additional codes in the frame.
 4. Overlapping tiles for images with multiple codes.
-5. Optional WeChat QR models for curved/low-contrast photos.
+5. ZXing-C++ on every variant, which decodes glossy screenshots and overexposed
+   phone photos that OpenCV can only detect but not read.
+6. Optional WeChat QR models for curved/low-contrast photos.
 
 Drop the four WeChat model files into `artifacts/wechat/` to enable step 5; see
 [`artifacts/wechat/README.md`](artifacts/wechat/README.md). Everything works
@@ -292,7 +299,7 @@ Allowlisted domains are still flagged if the payload uses a dangerous scheme.
 qrshield/
   features.py     78 URL features + text normalisation
   brands.py       official domains, risky TLDs, shorteners, keywords
-  qr_decode.py    multi-variant OpenCV/WeChat QR decoding
+  qr_decode.py    multi-variant OpenCV/ZXing QR decoding
   scanner.py      verdicts, rules, explanations, allowlist
   model.py        ensemble inference, calibration, explanations
   history.py      SQLite history and dashboard statistics
@@ -303,7 +310,7 @@ app/
 scripts/
   download_data.py, prepare_data.py, train_model.py
   benchmark_qr.py, model_benchmark.py
-tests/            56 tests: features, scanner, decoder, model, API, CLI,
+tests/            58 tests: features, scanner, decoder, model, API, CLI,
                   history, split integrity
 docs/             architecture, evaluation, resume kit, screenshots
 artifacts/        trained model, metrics, benchmark reports

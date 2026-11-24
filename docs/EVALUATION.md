@@ -110,21 +110,23 @@ distortions. Results on the current decoder:
 
 | Distortion | Decoded | Method | Time |
 |---|---|---|---|
-| clean | yes | opencv_single | 0.42 s |
-| gaussian blur | yes | opencv_multi | 0.51 s |
-| motion blur | yes | opencv_single | 0.66 s |
-| low contrast | yes | opencv_single | 0.49 s |
-| dark | yes | opencv_single | 0.70 s |
-| rotated 90° | yes | opencv_single | 0.77 s |
-| small (160 px) | yes | opencv_single | 0.23 s |
-| perspective | yes | opencv_multi | 0.84 s |
-| JPEG q30 | yes | opencv_single | 0.76 s |
-| sensor noise | yes | opencv_single | 0.95 s |
-| glare gradient | yes | opencv_multi | 0.80 s |
+| clean | yes | opencv_single | 0.26 s |
+| gaussian blur | yes | opencv_multi | 0.29 s |
+| motion blur | yes | opencv_single | 0.32 s |
+| low contrast | yes | opencv_single | 0.27 s |
+| dark | yes | opencv_single | 0.26 s |
+| rotated 90° | yes | opencv_single | 0.26 s |
+| small (160 px) | yes | opencv_single | 0.08 s |
+| perspective | yes | opencv_multi | 0.27 s |
+| JPEG q30 | yes | opencv_single | 0.26 s |
+| sensor noise | yes | opencv_single | 0.28 s |
+| glare gradient | yes | opencv_multi | 0.28 s |
 
-Decode rate: **11/11**, mean 0.65 s. A frame with two codes decoded both in
-2.66 s. The multi-variant strategy is slower than a single OpenCV pass but
-handles the distortions real users produce.
+Decode rate: **11/11**, mean 0.26 s. A frame with two codes decoded both in
+0.50 s. These synthetic codes are clean enough for OpenCV; real phone photos of
+glossy screens often need the ZXing-C++ pass, which is tried on every variant
+and decoded a 1077 px overexposed WhatsApp photo that OpenCV could only detect
+but not read.
 
 ## Latency
 

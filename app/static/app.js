@@ -367,7 +367,7 @@
     const warnings = [];
     if (data.overall && data.overall.warnings) warnings.push(...data.overall.warnings);
     if (data.image && data.image.warnings) warnings.push(...data.image.warnings);
-    const warningBlock = renderWarnings(warnings);
+    const warningBlock = renderWarnings([...new Set(warnings)]);
     if (warningBlock) results.append(warningBlock);
 
     data.results.forEach((result, index) => {

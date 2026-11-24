@@ -16,6 +16,8 @@ build_check/
 # Datasets and generated artifacts (reproducible via scripts)
 data/raw/
 data/processed/
+data/*.db
+data/*.db-journal
 artifacts/*.joblib
 !artifacts/qrshield_model.joblib
 artifacts/*.pt

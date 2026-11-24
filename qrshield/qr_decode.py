@@ -1,9 +1,11 @@
 """Robust QR decoding from camera photos and screenshots.
 
-Uses OpenCV's QR detector with several image preprocessing variants (CLAHE,
-adaptive thresholding, upscaling, sharpening, inversion, rotation). An optional
-WeChat QR detector is used when its model files are present, which is notably
-better on photos of curved or low-contrast codes.
+Three decoders are combined: OpenCV's QR detector (with CLAHE, adaptive
+thresholding, upscaling, sharpening, inversion and rotation variants), the
+optional WeChat detector when its model files are present, and ZXing-C++ when
+the ``zxing-cpp`` package is installed. ZXing is markedly better on glossy
+screenshots and overexposed phone photos, where OpenCV detects the finder
+patterns but cannot decode the payload.
 """
 
 from __future__ import annotations
@@ -17,6 +19,11 @@ import numpy as np
 from PIL import Image, ImageOps
 
 from .config import ARTIFACTS_DIR, MAX_PAYLOAD_LENGTH
+
+try:  # optional, but strongly recommended: decodes many photos OpenCV cannot
+    import zxingcpp
+except Exception:  # pragma: no cover - exercised only when the extra is absent
+    zxingcpp = None
 
 Source = Union[str, Path, bytes, bytearray, np.ndarray]
 
@@ -194,6 +201,65 @@ def _decode_with_wechat(img: np.ndarray, variant: str, scale: float,
         })
 
 
+def _zxing_point(point: Any) -> Optional[Tuple[float, float]]:
+    if point is None:
+        return None
+    for attr in ("x", "y"):
+        if hasattr(point, attr):
+            return float(getattr(point, "x", 0.0)), float(getattr(point, "y", 0.0))
+    try:
+        return float(point[0]), float(point[1])
+    except (TypeError, IndexError, ValueError):
+        return None
+
+
+def _zxing_bbox(position: Any, scale: float,
+                origin: Tuple[int, int]) -> Optional[List[List[int]]]:
+    if position is None:
+        return None
+    corners = [
+        _zxing_point(getattr(position, name, None))
+        for name in ("top_left", "top_right", "bottom_right", "bottom_left")
+    ]
+    if any(corner is None for corner in corners):
+        return None
+    ox, oy = origin
+    return [
+        [int(round(corner[0] / max(scale, 1e-6) + ox)),
+         int(round(corner[1] / max(scale, 1e-6) + oy))]
+        for corner in corners
+    ]
+
+
+def _decode_with_zxing(img: np.ndarray, variant: str, scale: float,
+                       results: List[Dict], seen: set,
+                       origin: Tuple[int, int] = (0, 0)) -> None:
+    """Decode with ZXing-C++ when the optional dependency is installed."""
+    if zxingcpp is None:
+        return
+    try:
+        found = zxingcpp.read_barcodes(img)
+    except Exception:
+        return
+    for barcode in found or []:
+        if not getattr(barcode, "valid", True):
+            continue
+        if "QRCode" not in str(getattr(barcode, "format", "")):
+            continue
+        text = (getattr(barcode, "text", "") or "").strip()
+        if not text or text.lower() in seen:
+            continue
+        if len(text) > MAX_PAYLOAD_LENGTH:
+            text = text[:MAX_PAYLOAD_LENGTH]
+        seen.add(text.lower())
+        results.append({
+            "data": text,
+            "bbox": _zxing_bbox(getattr(barcode, "position", None), scale, origin),
+            "method": "zxing",
+            "variant": variant,
+        })
+
+
 def _mask_found(gray: np.ndarray, results: List[Dict]) -> Tuple[np.ndarray, bool]:
     """White-out decoded QR regions so the detector can find the next code.
 
@@ -296,6 +362,7 @@ def decode_qr(source: Source, rotations: bool = True) -> Dict:
     for index, (name, img, scale) in enumerate(variants):
         _decode_with_opencv(img, detector, name, scale, results, seen)
         _decode_with_wechat(img, name, scale, results, seen)
+        _decode_with_zxing(img, name, scale, results, seen)
         if results and index >= 1 and detected_points <= len(results):
             break
 
@@ -306,6 +373,7 @@ def decode_qr(source: Source, rotations: bool = True) -> Dict:
                 rot = _rotate(img, angle)
                 _decode_with_opencv(rot, detector, f"{name}_rot{angle}", scale, results, seen)
                 _decode_with_wechat(rot, f"{name}_rot{angle}", scale, results, seen)
+                _decode_with_zxing(rot, f"{name}_rot{angle}", scale, results, seen)
                 if results:
                     break
             if results:
@@ -322,6 +390,7 @@ def decode_qr(source: Source, rotations: bool = True) -> Dict:
         for name, img, scale in _variants(masked)[:5]:
             _decode_with_opencv(img, detector, name, scale, results, seen)
             _decode_with_wechat(img, name, scale, results, seen)
+            _decode_with_zxing(img, name, scale, results, seen)
         if len(results) == before:
             break
 
@@ -341,6 +410,8 @@ def decode_qr(source: Source, rotations: bool = True) -> Dict:
                                     results, seen, (x0, y0))
                 _decode_with_wechat(img, f"tile_{name}", scale,
                                     results, seen, (x0, y0))
+                _decode_with_zxing(img, f"tile_{name}", scale,
+                                   results, seen, (x0, y0))
             if len(results) >= 4:
                 break
 

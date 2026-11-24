@@ -6,6 +6,7 @@ scipy==1.13.1
 scikit-learn==1.6.1
 joblib==1.5.1
 opencv-python==4.11.0.86
+zxing-cpp==2.2.0
 Pillow==11.2.1
 requests==2.32.5
 tldextract==5.3.0

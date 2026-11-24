@@ -63,6 +63,28 @@ def test_scan_non_url_payload():
     assert result["results"][0]["payload_type"] == "wifi_uri"
 
 
+def test_decode_wifi_qr_from_photo_style_image():
+    """Glossy/overexposed photos are decoded by the ZXing pass."""
+    img = _qr_bgr("WIFI:S:LSSD-Home;T:WPA;P:Lssd@123;H:false;;", size=1077)
+    img = cv2.convertScaleAbs(img, alpha=0.98, beta=28)
+    result = decode_qr(img)
+    assert result["count"] == 1
+    assert result["payloads"][0]["data"].startswith("WIFI:")
+
+
+def test_zxing_helper_reports_bbox_and_method():
+    pytest.importorskip("zxingcpp")
+    from qrshield.qr_decode import _decode_with_zxing
+
+    img = cv2.cvtColor(_qr_bgr("https://www.example.com/zxing"), cv2.COLOR_BGR2GRAY)
+    results, seen = [], set()
+    _decode_with_zxing(img, "original", 1.0, results, seen)
+    assert results, "ZXing should decode a clean synthetic QR"
+    assert results[0]["method"] == "zxing"
+    assert results[0]["bbox"] is not None
+    assert len(results[0]["bbox"]) == 4
+
+
 def test_blank_image_returns_helpful_error():
     result = scan_image(np.full((300, 300, 3), 255, dtype=np.uint8))
     assert result["ok"] is False
