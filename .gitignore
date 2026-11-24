@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+build_check/
+
+# Datasets and generated artifacts (reproducible via scripts)
+data/raw/
+data/processed/
+artifacts/*.joblib
+!artifacts/qrshield_model.joblib
+artifacts/*.pt
+artifacts/*.onnx
+artifacts/*.png
+!artifacts/demo_qr.png
+artifacts/wechat/*
+artifacts/reports/*
+
+# Keep the model metrics, WeChat instructions and evaluation reports
+!artifacts/metrics.json
+!artifacts/wechat/README.md
+!artifacts/reports/.gitkeep
+!artifacts/reports/*.png
+!artifacts/reports/*.json
+!artifacts/reports/misclassified.csv
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+tmp_*.py

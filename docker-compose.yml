@@ -1,0 +1,16 @@
+services:
+  qrshield:
+    build: .
+    image: qrshield:latest
+    container_name: qrshield
+    ports:
+      - "8000:8000"
+    environment:
+      QR_SHIELD_MODEL: /app/artifacts/qrshield_model.joblib
+      QR_SHIELD_DB: /app/data/qrshield.db
+    volumes:
+      # Trained model + optional WeChat models (read-only).
+      - ./artifacts:/app/artifacts:ro
+      # SQLite history persists across container restarts.
+      - ./data:/app/data
+    restart: unless-stopped

@@ -1,0 +1,235 @@
+{
+  "validation": {
+    "ranking": {
+      "roc_auc": 0.9995604554704884,
+      "average_precision": 0.9991739289487325,
+      "brier": 0.0066585707726973635
+    },
+    "at_malicious": {
+      "threshold": 0.6627,
+      "accuracy": 0.9897424318178153,
+      "precision": 0.9924339904266818,
+      "recall": 0.9752668049162916,
+      "f1": 0.9837755102040816,
+      "specificity": 0.9965192271263497,
+      "false_positive_rate": 0.0034807728736503127,
+      "false_negative_rate": 0.024733195083708463,
+      "mcc": 0.9763563225402232,
+      "confusion_matrix": {
+        "tn": 42085,
+        "fp": 147,
+        "fn": 489,
+        "tp": 19282
+      }
+    },
+    "at_suspicious": {
+      "threshold": 0.3313,
+      "accuracy": 0.9892908407657695,
+      "precision": 0.9748968534075657,
+      "recall": 0.991957918162966,
+      "f1": 0.9833533894905736,
+      "specificity": 0.9880422428490244,
+      "false_positive_rate": 0.011957757150975563,
+      "false_negative_rate": 0.00804208183703404,
+      "mcc": 0.9755403504166522,
+      "confusion_matrix": {
+        "tn": 41727,
+        "fp": 505,
+        "fn": 159,
+        "tp": 19612
+      }
+    }
+  },
+  "test": {
+    "ranking": {
+      "roc_auc": 0.9994660204791829,
+      "average_precision": 0.9990724017608011,
+      "brier": 0.0067052374950704735
+    },
+    "test_at_05": {
+      "threshold": 0.5,
+      "accuracy": 0.9904264994495238,
+      "precision": 0.9854032415543839,
+      "recall": 0.9853070389534316,
+      "f1": 0.9853551379057848,
+      "specificity": 0.9929125085926944,
+      "false_positive_rate": 0.007087491407305568,
+      "false_negative_rate": 0.014692961046568389,
+      "mcc": 0.9782441136710243,
+      "confusion_matrix": {
+        "tn": 41888,
+        "fp": 299,
+        "fn": 301,
+        "tp": 20185
+      }
+    },
+    "test_at_malicious": {
+      "threshold": 0.6627,
+      "accuracy": 0.9898042219137427,
+      "precision": 0.9925547227875118,
+      "recall": 0.9761300400273357,
+      "f1": 0.9842738660694509,
+      "specificity": 0.9964444023040273,
+      "false_positive_rate": 0.003555597695972693,
+      "false_negative_rate": 0.023869959972664258,
+      "mcc": 0.9768059533741442,
+      "confusion_matrix": {
+        "tn": 42037,
+        "fp": 150,
+        "fn": 489,
+        "tp": 19997
+      }
+    },
+    "test_at_suspicious": {
+      "threshold": 0.3313,
+      "accuracy": 0.989469149394476,
+      "precision": 0.9757174392935982,
+      "recall": 0.9924826710924534,
+      "f1": 0.9840286516310135,
+      "specificity": 0.9880057837722521,
+      "false_positive_rate": 0.011994216227747885,
+      "false_negative_rate": 0.007517328907546617,
+      "mcc": 0.9762532359462196,
+      "confusion_matrix": {
+        "tn": 41681,
+        "fp": 506,
+        "fn": 154,
+        "tp": 20332
+      }
+    }
+  },
+  "external": {
+    "ranking": {
+      "roc_auc": 0.9994373845482017,
+      "average_precision": 0.9985114003885862,
+      "brier": 0.008603635422750368
+    },
+    "at_malicious": {
+      "threshold": 0.6627,
+      "accuracy": 0.9877925531914894,
+      "precision": 0.9868947579031613,
+      "recall": 0.9678210536642794,
+      "f1": 0.9772648471940165,
+      "specificity": 0.9952201992191776,
+      "false_positive_rate": 0.004779800780822418,
+      "false_negative_rate": 0.03217894633572059,
+      "mcc": 0.9690083510833452,
+      "confusion_matrix": {
+        "tn": 27276,
+        "fp": 131,
+        "fn": 328,
+        "tp": 9865
+      }
+    },
+    "at_suspicious": {
+      "threshold": 0.3313,
+      "accuracy": 0.9842021276595745,
+      "precision": 0.9515476526484147,
+      "recall": 0.9922495830471892,
+      "f1": 0.9714724810296801,
+      "specificity": 0.9812091801364615,
+      "false_positive_rate": 0.018790819863538512,
+      "false_negative_rate": 0.007750416952810753,
+      "mcc": 0.96095841235922,
+      "confusion_matrix": {
+        "tn": 26892,
+        "fp": 515,
+        "fn": 79,
+        "tp": 10114
+      }
+    },
+    "by_source": {
+      "openphish": {
+        "count": 70,
+        "phishing_share": 1.0,
+        "at_malicious": {
+          "flag_rate": 0.9285714285714286,
+          "mean_probability": 0.9387390528075108
+        },
+        "at_suspicious": {
+          "flag_rate": 0.9571428571428572,
+          "mean_probability": 0.9387390528075108
+        }
+      },
+      "phishing_army": {
+        "count": 10123,
+        "phishing_share": 1.0,
+        "at_malicious": {
+          "flag_rate": 0.9680924627086832,
+          "mean_probability": 0.9713161672383246
+        },
+        "at_suspicious": {
+          "flag_rate": 0.992492344166749,
+          "mean_probability": 0.9713161672383246
+        }
+      },
+      "tranco_holdout": {
+        "count": 27407,
+        "phishing_share": 0.0,
+        "at_malicious": {
+          "flag_rate": 0.004779800780822418,
+          "mean_probability": 0.014302536686686107
+        },
+        "at_suspicious": {
+          "flag_rate": 0.018790819863538512,
+          "mean_probability": 0.014302536686686107
+        }
+      }
+    }
+  },
+  "operating_points": {
+    "malicious": 0.6627,
+    "suspicious": 0.33135,
+    "balanced": {
+      "threshold": 0.5077,
+      "accuracy": 0.990500459655178,
+      "precision": 0.9859154929577465,
+      "recall": 0.9842698902432856,
+      "f1": 0.9850920043534385,
+      "false_positive_rate": 0.006582686114794469,
+      "false_negative_rate": 0.01573010975671438
+    },
+    "high_precision": {
+      "threshold": 0.6627,
+      "accuracy": 0.9897263035659565,
+      "precision": 0.9924336009882644,
+      "recall": 0.975216225785241,
+      "f1": 0.9837495854486084,
+      "false_positive_rate": 0.0034807728736503127,
+      "false_negative_rate": 0.02478377421475899
+    },
+    "high_recall": {
+      "threshold": 0.7437,
+      "accuracy": 0.9891295582471816,
+      "precision": 0.9954340268769781,
+      "recall": 0.9703606292043903,
+      "f1": 0.9827374244442167,
+      "false_positive_rate": 0.0020837279787838604,
+      "false_negative_rate": 0.029639370795609733
+    },
+    "suspicious_operating": {
+      "threshold": 0.0038,
+      "accuracy": 0.9650016934664452,
+      "precision": 0.9017209111242982,
+      "recall": 0.999140154772141,
+      "f1": 0.947934161907961,
+      "false_positive_rate": 0.05098029929910968,
+      "false_negative_rate": 0.0008598452278589854
+    }
+  },
+  "weights": {
+    "linear": 0.6000000000000001,
+    "gradient_boosting": 0.4,
+    "extra_trees": -1.1102230246251565e-16
+  },
+  "thresholds": {
+    "suspicious": 0.33135,
+    "malicious": 0.6627
+  },
+  "counts": {
+    "train": 525823,
+    "val": 62003,
+    "test": 62673,
+    "external": 37600
+  }
+}

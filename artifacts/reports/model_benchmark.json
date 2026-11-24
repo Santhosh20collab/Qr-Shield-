@@ -1,0 +1,34 @@
+{
+  "model_path": "artifacts\\qrshield_model.joblib",
+  "model_size_mb": 4.54,
+  "features": 78,
+  "thresholds": {
+    "suspicious": 0.33135,
+    "malicious": 0.6627
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "load_seconds": 1.823,
+  "corpus_size": 400,
+  "single_url_ms": {
+    "mean": 3.961,
+    "median": 3.813,
+    "p95": 5.674,
+    "max": 6.612
+  },
+  "batch": {
+    "urls": 400,
+    "seconds": 0.075,
+    "throughput_urls_per_second": 5353.7
+  },
+  "full_scan_ms": {
+    "mean": 5.733,
+    "p95": 6.912
+  },
+  "prediction_range": [
+    0.0,
+    1.0
+  ]
+}

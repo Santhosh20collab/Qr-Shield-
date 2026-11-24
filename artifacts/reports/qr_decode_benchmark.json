@@ -1,0 +1,87 @@
+{
+  "single_code": [
+    {
+      "distortion": "clean",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.415
+    },
+    {
+      "distortion": "gaussian_blur",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_multi",
+      "seconds": 0.509
+    },
+    {
+      "distortion": "motion_blur",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.659
+    },
+    {
+      "distortion": "low_contrast",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.485
+    },
+    {
+      "distortion": "dark",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.702
+    },
+    {
+      "distortion": "rotated_90",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.773
+    },
+    {
+      "distortion": "small_160",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.227
+    },
+    {
+      "distortion": "perspective",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_multi",
+      "seconds": 0.835
+    },
+    {
+      "distortion": "jpeg_q30",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.759
+    },
+    {
+      "distortion": "sensor_noise",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_single",
+      "seconds": 0.948
+    },
+    {
+      "distortion": "glare_gradient",
+      "decoded": true,
+      "payload": "https://www.google.com/",
+      "method": "opencv_multi",
+      "seconds": 0.802
+    }
+  ],
+  "decode_rate": 1.0,
+  "mean_seconds": 0.647,
+  "multi_code": {
+    "decoded": 2,
+    "seconds": 2.655
+  }
+}

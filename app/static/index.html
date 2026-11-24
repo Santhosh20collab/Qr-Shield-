@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QR Shield detects phishing QR codes (quishing) locally on your machine.">
+  <title>QR Shield — quishing protection</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f8cff' stroke-width='2'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ab6ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <h1>QR Shield</h1>
+        <p>Quishing protection that runs locally</p>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge"><span class="dot"></span>On-device scan</span>
+      <span class="badge">No link is opened</span>
+      <span class="badge" id="version-badge">model</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-label="Scan input">
+      <div class="panel-head">
+        <h2>Check a QR code</h2>
+        <p>Decode the payload first, then score the destination before you open it.</p>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-image-btn" role="tab" aria-selected="true">Upload QR photo</button>
+        <button class="tab" id="tab-url-btn" role="tab" aria-selected="false">Paste a link</button>
+      </div>
+
+      <div class="panel-body">
+        <div id="pane-image">
+          <label class="dropzone" id="dropzone" for="file-input">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7fa8e8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+              <rect x="7" y="7" width="4" height="4" rx="0.6"/>
+              <rect x="13" y="7" width="4" height="4" rx="0.6"/>
+              <rect x="7" y="13" width="4" height="4" rx="0.6"/>
+              <path d="M13 13h1.5v1.5H13zM16.5 13H17v1.5h-.5zM13 16.5h1.5V17H13zM16.5 16.5H17V17h-.5z"/>
+            </svg>
+            <strong>Drop QR photos here</strong>
+            <span>or click to browse / use your camera</span>
+            <span>PNG, JPG, WebP, BMP — up to 12 MB each (20 per batch)</span>
+          </label>
+          <input id="file-input" type="file" accept="image/*" capture="environment" multiple hidden>
+
+          <div class="preview-wrap" id="preview-wrap" hidden>
+            <img id="preview" alt="Selected QR code preview">
+            <span class="file-count" id="file-count-badge" hidden></span>
+            <button class="preview-clear" id="preview-clear" type="button" title="Remove images" aria-label="Remove images">&times;</button>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="scan-btn" disabled>
+              <span id="scan-btn-label">Scan QR code</span>
+            </button>
+          </div>
+          <p class="hint">The image never leaves this device. The model runs offline and only inspects the decoded URL.</p>
+        </div>
+
+        <div id="pane-url" hidden>
+          <form id="url-form" class="field" autocomplete="off">
+            <label for="url-input">Link behind the QR code</label>
+            <div class="input-row">
+              <input id="url-input" type="text" inputmode="url" placeholder="https://example.com/login" spellcheck="false" maxlength="4096">
+              <button class="btn btn-primary" type="submit" id="check-btn">Check link</button>
+            </div>
+          </form>
+          <p class="hint">Paste the exact text the scanner shows. Nothing is fetched or opened.</p>
+
+          <div class="samples">
+            <span>Try an example:</span>
+            <div class="sample-btns">
+              <button class="sample" type="button" data-sample="https://www.amazon.co.uk/dp/B08N5WRWNW">Official Amazon</button>
+              <button class="sample" type="button" data-sample="http://paypal.com.secure-login.xyz/verify?id=123">Fake PayPal</button>
+              <button class="sample" type="button" data-sample="https://paypa1.com/login">Lookalike domain</button>
+              <button class="sample" type="button" data-sample="http://192.168.1.10:8080/bank/login.php">IP + port</button>
+              <button class="sample" type="button" data-sample="https://bit.ly/abc123">Short link</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="samples">
+          <span>Defensive design:</span>
+          <div class="sample-btns">
+            <span class="badge">Grouped-domain evaluation</span>
+            <span class="badge">Live-feed holdout</span>
+            <span class="badge">Explainable rules</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="result-panel" aria-live="polite">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6fa1ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M20 20l-3.5-3.5"/>
+            <path d="M8.5 11l1.8 1.8 3.4-3.6"/>
+          </svg>
+        </div>
+        <h3>Your result will appear here</h3>
+        <p>Upload a QR photo or paste a link. QR Shield decodes the destination and combines a trained model with brand, redirect and obfuscation checks.</p>
+      </div>
+      <div id="results"></div>
+    </section>
+  </main>
+
+  <section class="history-section" aria-label="Scan history">
+    <div class="history-head">
+      <div>
+        <h2>Recent activity</h2>
+        <p>Local-only history in SQLite. Nothing is uploaded.</p>
+      </div>
+      <div class="history-actions">
+        <button class="btn btn-ghost btn-sm" id="history-refresh" type="button">Refresh</button>
+        <button class="btn btn-ghost btn-sm danger" id="history-clear" type="button">Clear history</button>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="history-body">
+      <div class="history-empty" id="history-empty">
+        <strong>No scans yet</strong>
+        <span>Every link and QR scan will appear here with its verdict.</span>
+      </div>
+      <div id="history-rows"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>QR Shield · local-first quishing detector</span>
+    <span><a href="/api/info" target="_blank" rel="noopener">Model info</a> · <a href="/docs" target="_blank" rel="noopener">API docs</a></span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+name: Data integrity
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly: rebuild the domain-grouped splits and verify no domain leaks.
+    - cron: "0 4 * * 1"
+
+concurrency:
+  group: data-integrity
+  cancel-in-progress: true
+
+jobs:
+  splits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Download public datasets
+        run: python scripts/download_data.py
+
+      - name: Build grouped splits
+        run: python scripts/prepare_data.py
+
+      - name: Verify split integrity
+        run: pytest tests/test_split_integrity.py -q

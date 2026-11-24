@@ -1,0 +1,9 @@
+# Local allowlist
+#
+# Domains listed here are marked "allowlisted" unless the payload uses a
+# dangerous scheme. One entry per line: a hostname, a registrable domain, or
+# a URL prefix. Lines starting with # are ignored. Example:
+#
+# intranet.example.com
+# mybank.com
+# https://portal.example.org/
