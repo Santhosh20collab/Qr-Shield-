@@ -11,11 +11,19 @@ concurrency:
 
 jobs:
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        include:
+          - python-version: "3.9"
+            os: ubuntu-22.04
+          - python-version: "3.10"
+            os: ubuntu-latest
+          - python-version: "3.11"
+            os: ubuntu-latest
+          - python-version: "3.12"
+            os: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +46,26 @@ jobs:
       - name: Lint
         run: ruff check qrshield app scripts tests
 
+      - name: Environment snapshot
+        run: |
+          python -VV
+          python -m pip freeze > pip-freeze.txt
+          cat pip-freeze.txt
+
       - name: Tests
-        run: pytest --cov=qrshield --cov=app --cov-report=term-missing
+        run: |
+          set -o pipefail
+          pytest --cov=qrshield --cov=app --cov-report=term-missing 2>&1 | tee pytest.log
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.python-version }}
+          path: |
+            pytest.log
+            pip-freeze.txt
+          if-no-files-found: ignore
 
   package:
     runs-on: ubuntu-latest
