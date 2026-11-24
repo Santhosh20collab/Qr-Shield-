@@ -55,7 +55,7 @@ jobs:
       - name: Tests
         run: |
           set -o pipefail
-          pytest --cov=qrshield --cov=app --cov-report=term-missing 2>&1 | tee pytest.log
+          python -m pytest --cov=qrshield --cov=app --cov-report=term-missing 2>&1 | tee pytest.log
 
       - name: Upload failure logs
         if: failure()

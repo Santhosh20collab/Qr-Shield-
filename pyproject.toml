@@ -69,6 +69,7 @@ app = ["static/*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+pythonpath = ["."]
 
 [tool.coverage.run]
 source = ["qrshield", "app"]
