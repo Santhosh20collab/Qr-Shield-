@@ -52,9 +52,9 @@ dev = [
 qrshield = "qrshield.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourname/qr-shield"
-Repository = "https://github.com/yourname/qr-shield"
-Issues = "https://github.com/yourname/qr-shield/issues"
+Homepage = "https://github.com/Santhosh20collab/Qr-Shield-"
+Repository = "https://github.com/Santhosh20collab/Qr-Shield-"
+Issues = "https://github.com/Santhosh20collab/Qr-Shield-/issues"
 
 [tool.setuptools]
 packages = ["qrshield", "app"]

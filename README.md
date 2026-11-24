@@ -3,6 +3,7 @@
 **Local-first quishing (QR phishing) detection with a calibrated ML model and
 explainable rules.**
 
+[![CI](https://github.com/Santhosh20collab/Qr-Shield-/actions/workflows/ci.yml/badge.svg)](https://github.com/Santhosh20collab/Qr-Shield-/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-56%20passing-2ea44f)](tests)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -40,8 +41,8 @@ machine.
 ## Quick start
 
 ```powershell
-git clone https://github.com/yourname/qr-shield.git
-cd qr-shield
+git clone https://github.com/Santhosh20collab/Qr-Shield-.git
+cd Qr-Shield-
 
 python -m pip install -r requirements.txt
 
