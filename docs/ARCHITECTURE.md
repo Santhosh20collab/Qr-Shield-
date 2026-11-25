@@ -44,6 +44,7 @@ flowchart LR
 | `qrshield/cli.py` | `url`, `scan`, `batch`, `history`, `info`, `serve` commands |
 | `app/main.py` | FastAPI routes, validation, security headers, history recording |
 | `app/static/` | Vanilla HTML/CSS/JS single-page UI |
+| `extension/` | Manifest V3 popup, context-menu image scan, settings, local API client |
 
 ## Scan flow
 
@@ -130,17 +131,47 @@ The UI renders these as a risk breakdown, not a black-box score.
 Successful scans are written to SQLite (`data/qrshield.db`) with source, file
 name, payload, host, verdict, score, probability, reasons, and the full JSON.
 Writes happen in a threadpool and never fail the scan. `--no-history` disables
-recording for a CLI invocation.
+recording for a CLI invocation, and the API accepts `?save=false` for
+speculative frames (the camera probe) that should not pollute history.
+
+## Front-end and extension
+
+The web UI is one flow rather than a form wizard: a URL input, a drop zone, and
+an optional camera. Any of them triggers a scan immediately. A single image
+posts to `/api/scan`; multiple files post to `/api/scan-batch`. Results render
+as a verdict banner, risk meter, decoded payload, fact grid, rule signals, and
+a collapsible technical panel.
+
+- **No framework, no build step.** `app.js` is a single IIFE; `styles.css`
+  defines tokens for dark and light themes.
+- **Safe DOM.** Untrusted payloads and history rows are inserted with
+  `textContent`; static icons are the only `innerHTML` usage.
+- **Keyboard and clipboard.** `Ctrl/Cmd+K` focuses the input, paste anywhere
+  scans text or an image, `Esc` clears the field.
+- **Deep links.** `/?url=...` scans on load, then removes the parameter with
+  `history.replaceState` so a refresh does not rescan.
+- **Camera.** Uses the browser `BarcodeDetector` when available; otherwise it
+  posts low-frequency frames to `/api/scan?save=false` until a code is found,
+  then records the final payload once.
+- **History.** Search, verdict filters, detail replay, single delete, and clear
+  all reuse the same JSON result shape as a live scan.
+
+The extension is a separate, dependency-free MV3 package. Its popup calls the
+same local API; the background service worker adds a right-click image action,
+downloads only the image the user selected, posts it to `/api/scan`, and opens a
+compact result window. Host permissions are used for the local server and that
+explicit image fetch; the QR Shield server itself still never fetches a
+destination.
 
 ## API design
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/health` | liveness, model-loaded flag, uptime |
+| GET | `/api/health` (alias `/health`) | liveness, model-loaded flag, uptime |
 | GET | `/api/info` | version, limits, model metadata |
-| POST | `/api/scan` | one image (`multipart/form-data`, field `file`) |
+| POST | `/api/scan` | one image (`multipart/form-data`, field `file`); `?save=false` skips history |
 | POST | `/api/scan-batch` | up to 20 images, per-file errors isolated |
-| POST | `/api/scan-url` | `{"url": "..."}` |
+| POST | `/api/scan-url` | `{"url": "..."}`; `?save=false` skips history |
 | POST | `/api/scan-url/batch` | `{"urls": ["...", ...]}` (max 20) |
 | GET | `/api/history` | paginated history, filter by verdict, search `q` |
 | GET | `/api/history/{id}` | full stored result |

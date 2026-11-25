@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Shield result</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="result.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <strong>QR Shield</strong>
+        <small>Image scan result</small>
+      </span>
+    </div>
+    <button class="icon-button" id="close" type="button" title="Close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="result-area" id="result" aria-live="polite"></section>
+    <p class="source" id="source"></p>
+  </main>
+
+  <footer class="foot">
+    <a id="dashboard" href="http://127.0.0.1:8000/" target="_blank" rel="noopener">Open dashboard</a>
+    <span>Runs on this device</span>
+  </footer>
+
+  <script type="module" src="result.js"></script>
+</body>
+</html>

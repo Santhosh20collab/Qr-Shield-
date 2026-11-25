@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Shield settings</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <strong>QR Shield</strong>
+        <small>Extension settings</small>
+      </span>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Local engine</h2>
+      <p>The extension talks to the QR Shield server running on this machine. Nothing is sent to a cloud service.</p>
+      <label class="field">
+        <span>API base URL</span>
+        <input id="api-base" type="url" spellcheck="false" placeholder="http://127.0.0.1:8000">
+      </label>
+      <div class="actions">
+        <button class="btn primary" id="save" type="button">Save</button>
+        <button class="btn ghost" id="test" type="button">Test connection</button>
+        <button class="btn ghost" id="reset" type="button">Reset</button>
+      </div>
+      <p class="status" id="status">Start the server with <code>python -m qrshield serve</code>.</p>
+    </section>
+
+    <section class="panel">
+      <h2>How to use it</h2>
+      <ul class="list">
+        <li><strong>Popup:</strong> paste a link, drop a screenshot, or choose a photo.</li>
+        <li><strong>Right-click an image:</strong> choose “Scan image with QR Shield” to decode it in place.</li>
+        <li><strong>Keyboard:</strong> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Q</kbd> opens the popup.</li>
+      </ul>
+      <p class="note">The extension downloads an image only when you explicitly ask it to scan that image. The QR Shield server itself never fetches a destination.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Permissions</h2>
+      <ul class="list">
+        <li><strong>Host access:</strong> needed to reach the local server and to read an image you right-click.</li>
+        <li><strong>Clipboard:</strong> only when you press Paste.</li>
+        <li><strong>Context menu:</strong> adds the image scan action.</li>
+        <li><strong>Storage:</strong> remembers the API URL and the last result.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

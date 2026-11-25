@@ -45,6 +45,12 @@ malware detonation service.
 resolved, rendered, or executed. This removes SSRF, DNS rebinding, and
 drive-by-download risk from the scanning path.
 
+**The extension follows the same rule.** Its popup sends links and user-chosen
+images to the local API. The only external request it can make is downloading an
+image the user explicitly right-clicked; that fetch happens in the browser, not
+in the QR Shield server. Clipboard reads require a user action, and storage is
+limited to the API address and the last result.
+
 **Dangerous schemes are reported, not run.** `javascript:`, `data:`,
 `vbscript:`, and `file:` payloads are classified as malicious and displayed as
 text. They are never passed to a browser or shell.

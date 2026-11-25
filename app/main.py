@@ -33,7 +33,7 @@ from pydantic import BaseModel, Field
 
 from qrshield import __version__, history
 from qrshield.model import ModelNotFoundError, load_model
-from qrshield.scanner import scan_image, scan_url
+from qrshield.scanner import scan_image, scan_payload
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
@@ -106,6 +106,12 @@ async def health():
     }
 
 
+@app.get("/health", include_in_schema=False)
+async def health_alias():
+    """Compatibility alias for container/orchestrator health checks."""
+    return await health()
+
+
 @app.get("/api/info")
 async def info():
     model = app.state.model
@@ -162,7 +168,10 @@ async def _record_image_result(
 
 
 @app.post("/api/scan")
-async def scan(file: UploadFile = File(...)):
+async def scan(
+    file: UploadFile = File(...),
+    save: bool = Query(True, description="Record this scan in local history."),
+):
     data = await file.read()
     error = _check_image(file, data)
     if error:
@@ -170,7 +179,8 @@ async def scan(file: UploadFile = File(...)):
         raise HTTPException(status_code=status, detail=error)
     result = await run_in_threadpool(scan_image, data, app.state.model)
     result["filename"] = file.filename
-    await _record_image_result(result, file.filename)
+    if save:
+        await _record_image_result(result, file.filename)
     if not result.get("ok") and str(result.get("error", "")).startswith("Could not open"):
         raise HTTPException(status_code=400, detail=result["error"])
     return JSONResponse(result)
@@ -236,17 +246,21 @@ async def scan_batch(files: List[UploadFile] = File(...)):
 
 
 @app.post("/api/scan-url")
-async def api_scan_url(body: UrlRequest):
+async def api_scan_url(
+    body: UrlRequest,
+    save: bool = Query(True, description="Record this scan in local history."),
+):
     url = body.url.strip()
     if not url:
         raise HTTPException(status_code=400, detail="URL is empty.")
     if len(url) > 4096:
         raise HTTPException(status_code=400, detail="URL is too long.")
-    result = await run_in_threadpool(scan_url, url, app.state.model)
-    try:
-        await run_in_threadpool(history.record_scan, result, "url")
-    except Exception:
-        pass
+    result = await run_in_threadpool(scan_payload, url, app.state.model)
+    if save:
+        try:
+            await run_in_threadpool(history.record_scan, result, "url")
+        except Exception:
+            pass
     return JSONResponse(result)
 
 
@@ -257,7 +271,7 @@ async def api_scan_url_batch(body: BatchUrlRequest):
         url = url.strip()
         if not url or len(url) > 4096:
             continue
-        result = await run_in_threadpool(scan_url, url, app.state.model)
+        result = await run_in_threadpool(scan_payload, url, app.state.model)
         try:
             await run_in_threadpool(history.record_scan, result, "url")
         except Exception:

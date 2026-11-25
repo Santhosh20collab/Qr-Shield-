@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Shield</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <strong>QR Shield</strong>
+        <small id="status" data-state="loading"><span class="dot"></span><span id="status-text">Connecting…</span></small>
+      </span>
+    </div>
+    <button class="icon-button" id="options" type="button" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z"/>
+      </svg>
+    </button>
+  </header>
+
+  <main>
+    <form class="urlbar" id="url-form" autocomplete="off">
+      <input id="url-input" type="text" inputmode="url" spellcheck="false" maxlength="4096"
+             placeholder="Paste a link or QR text…" aria-label="Link or QR payload">
+      <button class="btn ghost" id="paste" type="button" title="Paste from clipboard">Paste</button>
+      <button class="btn primary" id="scan" type="submit">Scan</button>
+    </form>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a QR image">
+      <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+        <rect x="7" y="7" width="4" height="4" rx=".6"/>
+        <rect x="13" y="7" width="4" height="4" rx=".6"/>
+        <rect x="7" y="13" width="4" height="4" rx=".6"/>
+        <path d="M13.4 13.4h2v2h-2zM17 17h1.6v1.6H17zM13.4 17h1.6v1.6h-1.6z"/>
+      </svg>
+      <div>
+        <strong>Drop a QR image</strong>
+        <span>or <button class="link-button" id="browse" type="button">choose a photo</button></span>
+      </div>
+      <span class="hint">PNG · JPG · WebP · up to 12 MB</span>
+    </div>
+    <input id="file" type="file" accept="image/*" hidden>
+
+    <section class="result-area" id="result" aria-live="polite">
+      <div class="empty">
+        <span class="empty-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </span>
+        <h2>Scan before you click</h2>
+        <p>The local engine decodes the code, scores the destination, and explains the risk. Nothing is uploaded or opened.</p>
+        <p class="kbd"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Q</kbd> opens this popup</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <a id="dashboard" href="http://127.0.0.1:8000/" target="_blank" rel="noopener">Open dashboard</a>
+    <span>Runs on this device</span>
+  </footer>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

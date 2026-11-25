@@ -1,0 +1,23 @@
+body {
+  width: 100%;
+  min-width: 380px;
+  max-height: none;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  padding: 14px 16px 8px;
+  overflow: visible;
+}
+
+.result-area { margin-top: 0; min-height: 0; }
+
+.source {
+  margin: 9px 2px 0;
+  color: var(--subtle);
+  font-size: 0.66rem;
+  word-break: break-all;
+}
+
+.foot { position: sticky; bottom: 0; background: var(--bg); }

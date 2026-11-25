@@ -29,6 +29,10 @@ def test_health_and_info(client):
     assert health.json()["ok"] is True
     assert "uptime_seconds" in health.json()
 
+    alias = client.get("/health")
+    assert alias.status_code == 200
+    assert alias.json()["ok"] is True
+
     info = client.get("/api/info")
     assert info.status_code == 200
     body = info.json()
@@ -68,6 +72,22 @@ def test_scan_url_records_history(client):
 def test_scan_url_validation(client):
     assert client.post("/api/scan-url", json={"url": "   "}).status_code == 400
     assert client.post("/api/scan-url", json={"url": "https://example.com"}).status_code == 200
+
+
+def test_scan_url_can_skip_history(client):
+    response = client.post(
+        "/api/scan-url?save=false",
+        json={"url": "https://www.example.com/"},
+    )
+    assert response.status_code == 200
+    assert client.get("/api/history").json()["total"] == 0
+
+    image = client.post(
+        "/api/scan?save=false",
+        files={"file": ("qr.png", _qr_png("https://www.example.com/"), "image/png")},
+    )
+    assert image.status_code == 200
+    assert client.get("/api/history").json()["total"] == 0
 
 
 def test_scan_url_batch(client):

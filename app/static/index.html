@@ -1,152 +1,233 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="QR Shield detects phishing QR codes (quishing) locally on your machine.">
-  <title>QR Shield — quishing protection</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f8cff' stroke-width='2'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E">
+  <meta name="description" content="QR Shield decodes QR codes and checks the destination for phishing signals, locally on your machine.">
+  <meta name="theme-color" content="#070b14">
+  <title>QR Shield — scan before you click</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b8cff' stroke-width='2'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("qrshield-theme");
+        var theme = stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.dataset.theme = theme;
+      } catch (error) { /* keep default */ }
+    })();
+  </script>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">
-      <div class="brand-icon" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ab6ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <div class="backdrop" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="grid-lines"></span>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="M9 12l2 2 4-4"/>
         </svg>
-      </div>
-      <div>
-        <h1>QR Shield</h1>
-        <p>Quishing protection that runs locally</p>
-      </div>
-    </div>
-    <div class="header-badges">
-      <span class="badge"><span class="dot"></span>On-device scan</span>
-      <span class="badge">No link is opened</span>
-      <span class="badge" id="version-badge">model</span>
+      </span>
+      <span class="brand-copy">
+        <strong>QR Shield</strong>
+        <small>Local quishing guard</small>
+      </span>
+    </a>
+
+    <div class="topbar-right">
+      <span class="engine-status" id="engine-status" data-state="loading">
+        <span class="engine-dot"></span>
+        <span id="engine-text">Starting…</span>
+      </span>
+      <a class="topbar-link extension-link" href="https://github.com/Santhosh20collab/Qr-Shield-/tree/main/extension" target="_blank" rel="noopener">
+        Extension
+      </a>
+      <a class="topbar-link" href="/docs" target="_blank" rel="noopener">API</a>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme">
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/>
+        </svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <main class="layout">
-    <section class="panel" aria-label="Scan input">
-      <div class="panel-head">
-        <h2>Check a QR code</h2>
-        <p>Decode the payload first, then score the destination before you open it.</p>
-      </div>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>Runs entirely on this device</p>
+      <h1>Scan before<br><span class="grad">you click.</span></h1>
+      <p class="lede">Drop a QR photo or paste the link behind it. QR Shield decodes it, scores the destination with a trained model, and explains the risk in plain language.</p>
+    </section>
 
-      <div class="tabs" role="tablist">
-        <button class="tab active" id="tab-image-btn" role="tab" aria-selected="true">Upload QR photo</button>
-        <button class="tab" id="tab-url-btn" role="tab" aria-selected="false">Paste a link</button>
-      </div>
-
-      <div class="panel-body">
-        <div id="pane-image">
-          <label class="dropzone" id="dropzone" for="file-input">
-            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#7fa8e8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
-              <rect x="7" y="7" width="4" height="4" rx="0.6"/>
-              <rect x="13" y="7" width="4" height="4" rx="0.6"/>
-              <rect x="7" y="13" width="4" height="4" rx="0.6"/>
-              <path d="M13 13h1.5v1.5H13zM16.5 13H17v1.5h-.5zM13 16.5h1.5V17H13zM16.5 16.5H17V17h-.5z"/>
+    <section class="workspace" aria-label="Scanner">
+      <div class="card input-card">
+        <form class="urlbar" id="url-form" autocomplete="off" novalidate>
+          <span class="urlbar-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1L10.9 5"/>
+              <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1"/>
             </svg>
-            <strong>Drop QR photos here</strong>
-            <span>or click to browse / use your camera</span>
-            <span>PNG, JPG, WebP, BMP — up to 12 MB each (20 per batch)</span>
-          </label>
-          <input id="file-input" type="file" accept="image/*" capture="environment" multiple hidden>
+          </span>
+          <input id="url-input" name="url" type="text" inputmode="url" spellcheck="false" maxlength="4096"
+                 placeholder="Paste a link or QR text…" aria-label="Link or QR payload">
+          <button class="btn btn-ghost paste-btn" type="button" id="paste-btn" title="Paste from clipboard">Paste</button>
+          <button class="btn btn-primary" type="submit" id="check-btn">Scan</button>
+        </form>
 
-          <div class="preview-wrap" id="preview-wrap" hidden>
-            <img id="preview" alt="Selected QR code preview">
-            <span class="file-count" id="file-count-badge" hidden></span>
-            <button class="preview-clear" id="preview-clear" type="button" title="Remove images" aria-label="Remove images">&times;</button>
+        <div class="divider"><span>or drop a QR image</span></div>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop a QR image here, or press Enter to choose a file">
+          <span class="dropzone-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+              <rect x="7" y="7" width="4" height="4" rx=".6"/>
+              <rect x="13" y="7" width="4" height="4" rx=".6"/>
+              <rect x="7" y="13" width="4" height="4" rx=".6"/>
+              <path d="M13.4 13.4h2v2h-2zM17 17h1.6v1.6H17zM13.4 17h1.6v1.6h-1.6z"/>
+            </svg>
+          </span>
+          <div class="dropzone-text">
+            <strong>Drop, paste, or choose a photo</strong>
+            <span>PNG · JPG · WebP · BMP · up to 12 MB each · 20 at once</span>
           </div>
-
-          <div class="actions">
-            <button class="btn btn-primary" id="scan-btn" disabled>
-              <span id="scan-btn-label">Scan QR code</span>
+          <div class="dropzone-actions">
+            <button class="btn btn-soft" type="button" id="browse-btn">Choose image</button>
+            <button class="btn btn-soft" type="button" id="camera-btn" hidden>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 8.5a2 2 0 0 0-2-2h-3l-1.5-2h-7L7 6.5H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2z"/>
+                <circle cx="12" cy="13" r="3.4"/>
+              </svg>
+              Use camera
             </button>
           </div>
-          <p class="hint">The image never leaves this device. The model runs offline and only inspects the decoded URL.</p>
+          <span class="dropzone-hint">A scan starts automatically — no second click.</span>
         </div>
 
-        <div id="pane-url" hidden>
-          <form id="url-form" class="field" autocomplete="off">
-            <label for="url-input">Link behind the QR code</label>
-            <div class="input-row">
-              <input id="url-input" type="text" inputmode="url" placeholder="https://example.com/login" spellcheck="false" maxlength="4096">
-              <button class="btn btn-primary" type="submit" id="check-btn">Check link</button>
-            </div>
-          </form>
-          <p class="hint">Paste the exact text the scanner shows. Nothing is fetched or opened.</p>
+        <input id="file-input" type="file" accept="image/*" multiple hidden>
 
-          <div class="samples">
-            <span>Try an example:</span>
-            <div class="sample-btns">
-              <button class="sample" type="button" data-sample="https://www.amazon.co.uk/dp/B08N5WRWNW">Official Amazon</button>
-              <button class="sample" type="button" data-sample="http://paypal.com.secure-login.xyz/verify?id=123">Fake PayPal</button>
-              <button class="sample" type="button" data-sample="https://paypa1.com/login">Lookalike domain</button>
-              <button class="sample" type="button" data-sample="http://192.168.1.10:8080/bank/login.php">IP + port</button>
-              <button class="sample" type="button" data-sample="https://bit.ly/abc123">Short link</button>
-            </div>
+        <div class="preview" id="preview-wrap" hidden>
+          <img id="preview" alt="Selected QR image preview">
+          <span class="preview-count" id="preview-count">1 image</span>
+          <div class="preview-state" id="preview-state">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Scanning…</span>
           </div>
+          <button class="preview-clear" id="preview-clear" type="button" aria-label="Remove selected image">&times;</button>
         </div>
 
         <div class="samples">
-          <span>Defensive design:</span>
-          <div class="sample-btns">
-            <span class="badge">Grouped-domain evaluation</span>
-            <span class="badge">Live-feed holdout</span>
-            <span class="badge">Explainable rules</span>
+          <span class="samples-label">Try a sample</span>
+          <div class="chips">
+            <button class="chip sample" type="button" data-sample="http://paypal.com.secure-login.xyz/verify?id=123">Fake PayPal</button>
+            <button class="chip sample" type="button" data-sample="https://paypa1.com/login">Lookalike domain</button>
+            <button class="chip sample" type="button" data-sample="http://192.168.1.10:8080/bank/login.php">IP + port</button>
+            <button class="chip sample" type="button" data-sample="https://www.amazon.co.uk/dp/B08N5WRWNW">Official Amazon</button>
           </div>
         </div>
+
+        <p class="privacy">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="10" rx="2"/>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+          </svg>
+          Local-only. Images are processed on this device and no link is ever opened.
+        </p>
+      </div>
+
+      <div class="card result-card" id="result-panel" aria-live="polite" aria-busy="false">
+        <div class="empty" id="empty-state">
+          <span class="empty-badge" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          </span>
+          <h2>Nothing scanned yet</h2>
+          <p>Every verdict shows the destination, a risk score, and the exact signals behind it — with the technical detail one click away.</p>
+          <ul class="empty-points">
+            <li><span class="point-dot"></span>Trained on 688k URLs, tested on a live-feed holdout</li>
+            <li><span class="point-dot"></span>Explains brand impersonation, redirects and obfuscation</li>
+            <li><span class="point-dot"></span>Never fetches or opens the destination</li>
+          </ul>
+          <p class="kbd-hint"><kbd>Ctrl</kbd> + <kbd>V</kbd> anywhere to scan from the clipboard</p>
+        </div>
+        <div id="results" hidden></div>
       </div>
     </section>
 
-    <section class="panel" id="result-panel" aria-live="polite">
-      <div class="empty-state" id="empty-state">
-        <div class="empty-icon" aria-hidden="true">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6fa1ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7"/>
-            <path d="M20 20l-3.5-3.5"/>
-            <path d="M8.5 11l1.8 1.8 3.4-3.6"/>
-          </svg>
+    <section class="history" aria-label="Scan history">
+      <div class="history-head">
+        <div class="history-title">
+          <h2>Activity</h2>
+          <p>Saved locally in SQLite. Delete anything, anytime.</p>
         </div>
-        <h3>Your result will appear here</h3>
-        <p>Upload a QR photo or paste a link. QR Shield decodes the destination and combines a trained model with brand, redirect and obfuscation checks.</p>
+        <div class="history-actions">
+          <label class="search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M20 20l-3.5-3.5"/>
+            </svg>
+            <input id="history-search" type="search" placeholder="Search payload or host" aria-label="Search scan history">
+          </label>
+          <button class="btn btn-ghost btn-sm" id="history-refresh" type="button">Refresh</button>
+          <button class="btn btn-ghost btn-sm danger" id="history-clear" type="button">Clear</button>
+        </div>
       </div>
-      <div id="results"></div>
+
+      <div class="stats" id="stats-grid"></div>
+
+      <div class="filters" id="history-filters" role="tablist" aria-label="Filter history by verdict">
+        <button class="filter active" type="button" role="tab" aria-selected="true" data-verdict="">All</button>
+        <button class="filter" type="button" role="tab" aria-selected="false" data-verdict="malicious">Malicious</button>
+        <button class="filter" type="button" role="tab" aria-selected="false" data-verdict="suspicious">Suspicious</button>
+        <button class="filter" type="button" role="tab" aria-selected="false" data-verdict="safe">Safe</button>
+      </div>
+
+      <div class="history-list">
+        <div class="history-empty" id="history-empty">
+          <strong>No scans yet</strong>
+          <span>Drop a QR photo or paste a link to get started.</span>
+        </div>
+        <div id="history-rows"></div>
+      </div>
     </section>
+
+    <footer class="footer">
+      <span>QR Shield · local-first quishing detection</span>
+      <span class="footer-links">
+        <a href="https://github.com/Santhosh20collab/Qr-Shield-/tree/main/extension" target="_blank" rel="noopener">Browser extension</a>
+        <a href="/api/info" target="_blank" rel="noopener">Model</a>
+        <a href="/docs" target="_blank" rel="noopener">API</a>
+        <a href="https://github.com/Santhosh20collab/Qr-Shield-" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </footer>
   </main>
 
-  <section class="history-section" aria-label="Scan history">
-    <div class="history-head">
+  <div class="toast-stack" id="toasts" aria-live="assertive" aria-atomic="false"></div>
+
+  <dialog class="camera-dialog" id="camera-dialog" aria-label="Scan a QR code with the camera">
+    <div class="camera-head">
       <div>
-        <h2>Recent activity</h2>
-        <p>Local-only history in SQLite. Nothing is uploaded.</p>
+        <h2>Scan with camera</h2>
+        <p>Hold the code inside the frame.</p>
       </div>
-      <div class="history-actions">
-        <button class="btn btn-ghost btn-sm" id="history-refresh" type="button">Refresh</button>
-        <button class="btn btn-ghost btn-sm danger" id="history-clear" type="button">Clear history</button>
-      </div>
+      <button class="icon-button" id="camera-close" type="button" aria-label="Close camera">&times;</button>
     </div>
-
-    <div class="stats-grid" id="stats-grid"></div>
-
-    <div class="history-body">
-      <div class="history-empty" id="history-empty">
-        <strong>No scans yet</strong>
-        <span>Every link and QR scan will appear here with its verdict.</span>
-      </div>
-      <div id="history-rows"></div>
+    <div class="camera-stage">
+      <video id="camera-video" playsinline muted autoplay></video>
+      <div class="camera-frame" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     </div>
-  </section>
-
-  <footer class="footer">
-    <span>QR Shield · local-first quishing detector</span>
-    <span><a href="/api/info" target="_blank" rel="noopener">Model info</a> · <a href="/docs" target="_blank" rel="noopener">API docs</a></span>
-  </footer>
+    <p class="camera-status" id="camera-status">Requesting camera…</p>
+    <p class="camera-note">Frames stay on this device and are never saved.</p>
+  </dialog>
 
   <script src="/static/app.js"></script>
 </body>

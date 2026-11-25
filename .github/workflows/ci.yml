@@ -77,6 +77,24 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+  extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Validate manifest
+        run: |
+          python3 -m json.tool extension/manifest.json > /dev/null
+          test -f extension/icons/icon128.png
+      - name: Syntax-check extension modules
+        run: |
+          for file in extension/*.js; do
+            echo "checking $file"
+            node --input-type=module --check < "$file"
+          done
+
   package:
     runs-on: ubuntu-latest
     needs: lint-and-test

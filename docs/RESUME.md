@@ -28,9 +28,10 @@ Pick 3–5; keep the numbers.
 - Implemented an explainability layer that surfaces rule-level reasons, model
   attention tokens, and numeric feature contributions, so every verdict is
   auditable rather than a black-box score.
-- Built a FastAPI service and vanilla-JS dashboard with single/batch image and
-  URL scanning, live statistics, 7-day trends, and searchable SQLite scan
-  history shared between the CLI and web UI.
+- Built a FastAPI service and a one-step vanilla-JS interface: paste, drop, or
+  camera scanning, batch results, live statistics, 7-day trends, and searchable
+  SQLite history shared between the CLI, web UI, and a Manifest V3 browser
+  extension.
 - Added a `qrshield` CLI (`url`, `scan`, `batch`, `history`, `info`, `serve`)
   with JSON/CSV reports and meaningful exit codes for scripting and pre-open
   hooks.
@@ -47,8 +48,8 @@ Pick 3–5; keep the numbers.
 > (URL, Wi-Fi join, UPI payment, `javascript:` scheme, nested redirect), and
 > scores it with a calibrated ML model plus auditable rules. It never opens or
 > fetches the link. The result is a verdict, a probability, and a plain-English
-> explanation, available through a CLI, a JSON API, and a dashboard with local
-> scan history.
+> explanation, available through a CLI, a JSON API, a one-step web interface,
+> local scan history, and a Manifest V3 browser extension.
 
 ## STAR stories
 
@@ -105,10 +106,11 @@ workflow.
 **Task:** Make it installable, testable, and deployable.
 
 **Action:** Added `pyproject.toml` with a console entry point, pinned
-requirements, 58 tests (features, scanner, decoder, model, API, CLI, history,
+requirements, 59 tests (features, scanner, decoder, model, API, CLI, history,
 split integrity), ruff linting, coverage, GitHub Actions across four Python
-versions, a non-root Dockerfile with healthcheck, docker-compose, Makefile, and
-full documentation (README, model card, architecture, evaluation, security).
+versions, a non-root Dockerfile with healthcheck, docker-compose, Makefile, a
+Manifest V3 extension, and full documentation (README, model card,
+architecture, evaluation, security).
 
 **Result:** `pip install .` exposes `qrshield`; `docker compose up` runs the
 app; CI catches lint, test, and packaging regressions.
@@ -127,7 +129,7 @@ app; CI catches lint, test, and packaging regressions.
 | Inference latency | 3.96 ms mean, 5.67 ms p95 |
 | Batch throughput | ~5,350 URLs/s |
 | QR decode benchmark | 11/11, 0.26 s mean |
-| Tests | 58 passing |
+| Tests | 59 passing |
 
 ## Likely interview questions
 
@@ -172,9 +174,12 @@ and adding a regression test.
    brand recognized.
 2. `python -m qrshield url "http://paypal.com.secure-login.xyz/verify"` →
    malicious, with impersonation reasons.
-3. Open the web app, upload `artifacts/demo_qr.png` → decoded payload, verdict,
-   risk breakdown.
-4. Upload a batch of images → per-file results and worst-case summary.
-5. Show the dashboard: today's scans, 7-day chart, top triggers.
-6. `python -m qrshield batch samples/ --csv report.csv --fail-on malicious` →
+3. Open the web app, drop `artifacts/demo_qr.png` anywhere on the page → the
+   scan starts automatically with decoded payload, verdict, and risk breakdown.
+4. Drop several images at once → per-file results and a worst-case summary.
+5. Show the dashboard: today's scans, 7-day chart, top triggers, searchable
+   history.
+6. Open the extension popup and scan the same link; right-click a QR image on a
+   page to show the context-menu flow.
+7. `python -m qrshield batch samples/ --csv report.csv --fail-on malicious` →
    exit code 1 for CI/pre-open hooks.
